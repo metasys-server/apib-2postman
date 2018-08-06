@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 
-var fs = require('fs'),
-    path = require('path'),
-    nopt = require('nopt'),
-    apibIncludeDirective = require('apib-include-directive'),
-    apib2postman = require('../src/index.js');
+const fs = require('fs');
+const eol = require('eol');
+const path = require('path');
+const nopt = require('nopt');
+const apibIncludeDirective = require('apib-include-directive');
+const apib2postman = require('../src/index.js');
 
 var options = nopt({
     'output': String,
@@ -53,7 +54,7 @@ var apibData = '';
         if (output !== '-') {
             console.log('Processing API Blueprint...');
         }
-        processBlueprint(apibData, options);
+        processBlueprint(eol.lf(apibData), options);
     });
 
 function processBlueprint(blueprint, opts) {

@@ -1,6 +1,6 @@
 # API Blueprint to Postman
 
-## Quick Start
+## Quickstart
 1. Install NodeJS https://nodejs.org/en/download/current/
 
 2. Setup NPM to use our internal proxies
