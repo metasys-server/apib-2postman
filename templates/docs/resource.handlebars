@@ -1,0 +1,39 @@
+<div class="resource">
+
+    <!-- Name -->
+    <h2 class="resourceName">
+        {{name}}
+    </h2>
+    <!-- /Name -->
+
+    <!-- Parameters -->
+    <div class="row resourceParameters hidden"></div>
+    <!-- /Parameters -->
+
+    <!-- Attributes -->
+    <div class="row resourceAttributes hidden">
+        <div class="row attributesTitle">
+            <h3 class="row attributesTitleText">Attributes</h3>
+        </div>
+
+        <div class="row attributes"></div>
+        <div class="row attributesKit hidden"></div>
+    </div>
+    <!-- /Attributes -->
+
+    <!-- Description -->
+    <div class="resourceDescription markdown formalTheme">
+        <p>{{description}}</p>
+    </div>
+    <!-- /Description -->
+
+    <!-- Actions -->
+    <div class="resourceActions">
+        {{#item}}
+        {{> action}}
+
+        {{/item}}
+    </div>
+    <!-- /Actions -->
+
+</div>

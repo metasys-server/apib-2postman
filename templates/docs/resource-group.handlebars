@@ -1,0 +1,24 @@
+<div class="resourceGroup">
+
+    <!-- Name -->
+    <h1 class="resourceGroupName">
+        {{name}}
+    </h1>
+    <!-- /Name -->
+
+    <!-- Description -->
+    <div class="resourceGroupDescription markdown formalTheme">
+        <p>{{description}}</p>
+    </div>
+    <!-- /Description -->
+
+    <!-- Resources -->
+    <div class="resources">
+        {{#item}}
+        {{> resource}}
+
+        {{/item}}
+    </div>
+    <!-- /Resources -->
+
+</div>

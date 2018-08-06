@@ -1,0 +1,13 @@
+{
+    "name": {{{json name}}},
+    "description": {{{json description}}},
+    "item": [
+        {{#groups}}
+        {{#actions}}
+        {{> action~}}
+        {{#unless @last}},{{/unless}}
+        {{/actions}}
+        {{#unless @last}},{{/unless}}
+        {{/groups}}
+    ]
+}

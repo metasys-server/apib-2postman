@@ -1,0 +1,139 @@
+var _ = require('lodash'),
+    Url = require('postman-collection').Url;
+
+// Used to catch and show fatal errors in the test runner 
+try {
+    const isSuccess = responseCode.code === {{statusCode}};
+    const jsonData = pm.response.json();
+
+    tests['Status code is correct'] = isSuccess;
+
+    {{#headers}}
+    pm.test('{{key}} header value is correct', function () {
+        pm.expect(postman.getResponseHeader('{{key}}')).to.contain('{{value}}');
+    });
+
+    {{/headers}}
+    pm.test('Self link is correct', function () {
+        const self = Url.parse(jsonData.self);
+        const current = pm.request.url.toJSON();
+
+        const pathDiffs = _.difference(self.path, current.path);
+        const queryDiffs = _.differenceWith(self.query, current.query, _.isEqual);
+
+        const pathDiffsDupe = pathDiffs.slice(0);
+
+        // Check if any of the differences are caused by the parent id being returned or version number in the url
+        for (let diff of pathDiffsDupe) {
+            if (jsonData.id === diff || pm.request.headers.get('Accept').indexOf(diff) !== -1) {
+                pathDiffs.splice(pathDiffs.indexOf(diff), 1);
+            }
+        }
+
+        pm.expect(pathDiffs.length).to.equal(0, 'Differences found in the path:   (' + pathDiffs.join(', ') + ')   ');
+        pm.expect(queryDiffs.length).to.equal(0, 'Differences found in the query:   (' + queryDiffs.join(', ') + ')   ');
+    });
+
+    const schema = {{{schema}}};
+
+    pm.test('JSON Schema is valid', function() {
+        pm.expect(tv4.validate(jsonData, schema)).equal(true, tv4.error);
+    });
+
+    {{#if isPageable}}
+    if (!pm.environment.get('{{pathName}}id')) {
+        if (jsonData.items.length > 0 && jsonData.items[0].id) {
+            const id = jsonData.items[0].id;
+            pm.environment.set('{{pathName}}id', id);
+            tests['Set {{pathName}}id to ' + id] = true;
+        } else {
+            tests['Failed to set {{pathName}}id, could not find a matching item in the result set'] = false;
+        }
+    }
+
+    tests['Items should be returned'] = jsonData.items.length > 0;
+
+    const testRequests = [];
+
+    function runNextTest() { if (testRequests.length > 0) testRequests.pop()(() => runNextTest()); }
+
+    function testRequest(newParams, assertCallback) {
+        testRequests.push((callback) => {
+            const newUrl = _.cloneDeep(pm.request.url);
+            newUrl.query.assimilate(newParams);
+
+            const newRequest = {
+                url: newUrl.toString(),
+                method: pm.request.method,
+                header: pm.request.headers.toString()
+            };
+
+            pm.sendRequest(newRequest, (err, res) => {
+                assertCallback(err, res);
+                callback();
+            });
+        });
+    }
+
+    if (isSuccess && pm.environment.get('include_sad_tests') === 'true') {
+        const invalidPageError = '"The specified pageSize is outside the valid range (1 - 1000)"';
+
+        testRequest([{
+            key: 'page',
+            value: '-2'
+        }], (err, res) => {
+            pm.test('Negative page number should return the correct error response', () => {
+                pm.expect(err).to.equal(null);
+                pm.expect(res).to.have.status(400);
+                pm.expect(res).to.have.body('"The specified page must be greater than 0"');
+            });
+        });
+
+        testRequest([{
+            key: 'pageSize',
+            value: '-4'
+        }], (err, res) => {
+            pm.test('Negative page size should return the correct error response', () => {
+                pm.expect(err).to.equal(null);
+                pm.expect(res).to.have.status(400);
+                pm.expect(res).to.have.body(invalidPageError);
+            });
+        });
+
+        testRequest([{
+            key: 'pageSize',
+            value: '10005'
+        }], (err, res) => {
+            pm.test('Large page size should return the correct error response', () => {
+                pm.expect(err).to.equal(null);
+                pm.expect(res).to.have.status(400);
+                pm.expect(res).to.have.body(invalidPageError);
+            });
+        });
+
+        {{#if sortParams}}
+        testRequest([{
+            key: 'sort',
+            value: 'invalidOne'
+        }], (err, res) => {
+            pm.test('Invalid sort parameter should return the correct error response', () => {
+                pm.expect(err).to.equal(null);
+                pm.expect(res).to.have.status(400);
+
+                const sortRegex = new RegExp(/^.*Valid attributes: (.*)$/gm);
+                const actual = sortRegex.exec(res.json())[1].replace(/ /g, '').split(',');
+                const difference = _.difference(actual, [
+                    {{#sortParams}}'{{this}}'{{#unless @last}}, {{/unless}}{{/sortParams}}
+                ]);
+
+                pm.expect(difference.length).to.equal(0, 'Extraneous sort attributes found:    (' + difference.join(', ') + ')   ');
+            });
+        });
+        {{/if}}
+    }
+
+    runNextTest();
+    {{/if}}
+} catch (error) {
+    tests['Fatal error running tests: ' + error] = false;
+}

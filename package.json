@@ -1,0 +1,21 @@
+{
+  "name": "@apib/2postman",
+  "description": "Convert API Blueprints to Postman",
+  "version": "1.0.0",
+  "license": "MIT",
+  "dependencies": {
+    "apib-include-directive": "^0.1.0",
+    "drafter.js": "^2.6.7",
+    "handlebars": "^4.0.11",
+    "lodash": "^4.17.10",
+    "nopt": "^3.0.6",
+    "uritemplate": "^0.3.4"
+  },
+  "bin": {
+    "apib2postman": "./bin/apib2postman.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+git@github.jci.com:jchrisco/apib2.git"
+  }
+}

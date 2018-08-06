@@ -1,0 +1,44 @@
+{
+    "name": {{{json name}}},
+    "request": {
+        "url": {
+            "host": [
+                "\{{base_url}}"
+            ],
+            "path": [
+                {{#path}}
+                "{{this}}"{{#unless @last}},{{/unless}}
+                {{/path}}
+            ],
+            "query": [
+                {{#query}}
+                {{> kv-item~}}
+                {{#unless @last}},{{/unless}}
+                {{/query}}
+            ],
+            "variable": [
+                {{#variables}}
+                {{> kv-item~}}
+                {{#unless @last}},{{/unless}}
+                {{/variables}}
+            ]
+        },
+        "description": {{{json description}}},
+        "method": {{{json request.method}}},
+        "header": [
+            {{#request.headers}}
+            {{> kv-item~}}
+            {{#unless @last}},{{/unless}}
+            {{/request.headers}}
+        ]{{#if request.body}},
+        "body": {
+            "mode": "raw",
+            "raw": {{{json request.body}}}
+        }
+        {{/if}}
+    }{{#if response.tests}},
+    "event": [
+        {{> test response.tests}}
+    ]
+    {{/if}}
+}

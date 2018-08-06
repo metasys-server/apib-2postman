@@ -1,0 +1,10 @@
+node_modules/
+newman/
+doc_files/
+
+Metasys API 2.postman_collection.json
+Metasys API 2.postman_environment.json
+Metasys API.postman_collection.json
+Metasys API.postman_environment.json
+api-icd-v2.md
+api-icd.md
