@@ -3,10 +3,14 @@ const _ = require('lodash'),
       path = require('path'),
       Handlebars = require('handlebars');
 
-Handlebars.registerPartial('item', fs.readFileSync('./templates/postman/item.hbs', 'utf8'));
-Handlebars.registerPartial('action', fs.readFileSync('./templates/postman/action.hbs', 'utf8'));
-Handlebars.registerPartial('kv-item', fs.readFileSync('./templates/postman/kv-item.hbs', 'utf8'));
-Handlebars.registerPartial('test', fs.readFileSync('./templates/postman/test.hbs', 'utf8'));
+function getPartialPath(name) {
+  return path.resolve(__dirname, '../', '../', 'templates', 'postman', name);
+}
+
+Handlebars.registerPartial('item', fs.readFileSync(getPartialPath('item.hbs'), 'utf8'));
+Handlebars.registerPartial('action', fs.readFileSync(getPartialPath('action.hbs'), 'utf8'));
+Handlebars.registerPartial('kv-item', fs.readFileSync(getPartialPath('kv-item.hbs'), 'utf8'));
+Handlebars.registerPartial('test', fs.readFileSync(getPartialPath('test.hbs'), 'utf8'));
 
 const templates = {
   tests: require('../../templates/postman/actions/js-tests.hbs'),
