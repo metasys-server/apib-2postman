@@ -1,22 +1,16 @@
 # API Blueprint to Postman
 
 ## Quickstart
-1. Install NodeJS https://nodejs.org/en/download/current/
-
-2. Setup NPM to use our internal proxies
+1. Install the package globally
     ```
-    npm config set proxy http://gateway.zscalertwo.net:10093/
-    npm config set https-proxy http://gateway.zscalertwo.net:10093/
+    npm i -g @apib/2postman
     ```
 
-3. Install the package globally
-    ```
-    npm i -g git+https://github.jci.com/jchrisco/apib-2postman
-    ```
+2. Obtain an API blueprint definition file. This is usually created with markdown using [API blueprint](https://apiblueprint.org/) syntax. You can then feed this blueprint into the following command to have a Postman collection generated from it.
 
-4. Run the command to generate a Postman collection and environment
+3. Run the command to generate a Postman collection and environment
     ```
-    apib2postman my-blueprint.md -o collection.json -e environment.json
+    apib2postman api-icd.md -o collection.json -e environment.json
     ```
 
 ## Command Line Options
