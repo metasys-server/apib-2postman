@@ -23,7 +23,6 @@ function getTestTemplate(testTemplate) {
 
 function parseTests(pathName, action, testTemplate) {
   const {
-    statusCode,
     headers,
     jsonSchema
   } = action.response;
@@ -36,17 +35,22 @@ function parseTests(pathName, action, testTemplate) {
     sortParams.push(...sortRegex.exec(sortQuery.description)[1].replace(/[` ]?/g, '').split(','));
   }
 
+  action.response = {
+    ...action.response,
+    jsonSchema: JSON.stringify(jsonSchema, null, 2),
+    headers: _.filter(headers, x => x.key !== 'Allow')
+  };
+
   const isPageable = !!jsonSchema.properties.items
     && !!jsonSchema.properties.next
     && jsonSchema.properties.items.type === 'array';
 
   const testExec = getTestTemplate(testTemplate)({
-    pathName: pathName,
-    statusCode: statusCode,
-    headers: _.filter(headers, x => x.key !== 'Allow'),
-    schema: JSON.stringify(jsonSchema, null, 2),
-    isPageable: isPageable,
-    sortParams: sortParams
+    pathName,
+    isPageable,
+    sortParams,
+    request: action.request,
+    response: action.response
   });
 
   return testExec.split(/\r\n?|\n/g);
@@ -56,7 +60,7 @@ module.exports = function (collection, environment, options) {
   collection.items.forEach(item => {
     item.groups.forEach(group => {
       group.actions.forEach(action => {
-        action.response.tests = action.response.tests || parseTests(group.path, action, options.testTemplate);
+        action.response.tests = action.response.tests || parseTests(group.path, _.cloneDeep(action), options.testTemplate);
       });
     });
   });

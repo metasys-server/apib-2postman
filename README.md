@@ -10,7 +10,7 @@
 
 3. Run the command to generate a Postman collection and environment
     ```
-    apib2postman api-icd.md -o collection.json -e environment.json
+    apib2postman <your-blueprint.apib> -o collection.json -e environment.json
     ```
 
 ## Command Line Options
@@ -44,8 +44,7 @@ This template is applied to every action and the variables which get passed to t
 | Name | Description | Example |
 | ---- | ----------- | ------- |
 | pathName | The path of the group collection as a standardized name. | `networkDevices_` for /api/networkDevices/:id |
-| statusCode | The expected status code for the action | `200` |
-| headers | The expected headers to be returned | `[ { key: "Accept", value: "application/json" } ]` |
-| schema | The JSON schema for the action's response | `{ large schema here... }` |
 | isPageable | Returns true if the response schema has a collection within | `true` |
 | sortParams | The accepted sort parameters parsed from the sort query parameter description | `[ "name", "category" ]` |
+| request | The same request definition passed to the postman collection template | `{ }` |
+| response | The same response definition passed to the postman collection template | `{ }` |

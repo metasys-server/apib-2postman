@@ -2,7 +2,8 @@ const _ = require('lodash'),
       drafter = require('drafter.js'),
       UriTemplate = require('uritemplate'),
       Handlebars = require('handlebars'),
-      postmanGenerator = require('./generators/postman');
+      postmanGenerator = require('./generators/postman'),
+      fs = require('fs');
 
 Handlebars.registerHelper('json', function (obj) {
   return JSON.stringify(obj, null, 4);
@@ -150,6 +151,19 @@ function parseAttributes(attributes, uriTemplate) {
     }
   });
 
+  uriTemplate.expressions.filter(x => x.templateText && !x.templateText.startsWith('?')).forEach(variable => {
+    const name = variable.templateText;
+
+    if (!result.variable.some(x => x.key === name)) {
+      result.variable.push({
+        key: name,
+        value: `{{${pathName}${name}}}`
+      });
+  
+      result.envVariable.push(pathName + name);
+    }
+  });
+
   return result;
 }
 
@@ -178,6 +192,7 @@ function parseResponse(response) {
   return {
     statusCode: response.attributes.statusCode,
     headers: parseHeaders(response.attributes.headers.content),
+    body: parseContent(response.content, 'messageBody'),
     jsonSchema: parseJsonSchema(response.content),
     tests: parseBodyTests(response.content)
   };
