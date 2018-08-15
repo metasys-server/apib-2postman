@@ -35,11 +35,8 @@ function parseTests(pathName, action, testTemplate) {
     sortParams.push(...sortRegex.exec(sortQuery.description)[1].replace(/[` ]?/g, '').split(','));
   }
 
-  action.response = {
-    ...action.response,
-    jsonSchema: JSON.stringify(jsonSchema, null, 2),
-    headers: _.filter(headers, x => x.key !== 'Allow')
-  };
+  action.response.jsonSchema = JSON.stringify(jsonSchema, null, 2);
+  action.response.headers = _.filter(headers, x => x.key !== 'Allow');
 
   const isPageable = !!jsonSchema.properties.items
     && !!jsonSchema.properties.next
