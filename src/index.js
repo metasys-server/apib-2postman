@@ -10,6 +10,7 @@ Handlebars.registerHelper('json', function (obj) {
 });
 
 var apib2postman = module.exports.convertParsed = function (apib, options) {
+  fs.writeFileSync('raw.json', JSON.stringify(apib, null, 2));
   const title = apib.content[0].meta.title;
 
   const collection = {
@@ -83,7 +84,7 @@ function parsePath(uriTemplate) {
     }
   }
 
-  return `api${decodeURIComponent(uriTemplate.expand(params))}`.split('/');
+  return decodeURIComponent(uriTemplate.expand(params)).split('/').slice(1);
 }
 
 function parseActions(baseAction, actions, environment) {
@@ -173,7 +174,7 @@ function parseRequest(request) {
   return {
     method: method,
     headers: parseRequestHeaders(headers),
-    body: parseContent(request.content, 'messageBody')
+    body: parseRequestBody(request.content)
   };
 }
 
@@ -192,14 +193,37 @@ function parseResponse(response) {
   return {
     statusCode: response.attributes.statusCode,
     headers: parseHeaders(response.attributes.headers.content),
-    body: parseContent(response.content, 'messageBody'),
+    body: parseContent(response.content, 'messageBody').content,
     jsonSchema: parseJsonSchema(response.content),
     tests: parseBodyTests(response.content)
   };
 }
 
+function parseRequestBody(content) {
+  const requestBody = parseContent(content, 'messageBody');
+
+  let mode = 'raw';
+  let body = requestBody.content;
+
+  if (requestBody.attributes && requestBody.attributes.contentType === 'application/x-www-form-urlencoded') {
+    const props = body.trim().split('&');
+
+    mode = 'urlencoded';
+    body = props.map(x => ({
+      key: x.split('=')[0],
+      value: x.split('=')[1],
+      type: 'text'
+    }));
+  }
+
+  return {
+    mode: mode,
+    [mode]: body
+  };
+}
+
 function parseBodyTests(content) {
-  const testStr = parseContent(content, 'messageBody');
+  const testStr = parseContent(content, 'messageBody').content;
   if (!testStr) return null;
 
   const tests = new RegExp(/^.*\+ Tests\n\n        (.*)$/gm).exec(testStr);
@@ -219,7 +243,7 @@ function applyRequiredProperties(obj) {
 }
 
 function parseJsonSchema(content) {
-  const schema = JSON.parse(parseContent(content, 'messageBodySchema'));
+  const schema = JSON.parse(parseContent(content, 'messageBodySchema').content);
   
   if (schema) {
     applyRequiredProperties(schema);
@@ -232,7 +256,7 @@ function parseJsonSchema(content) {
 
 function parseContent(content, className) {
   const found = _.find(content, x => x.element === 'asset' && _.includes(x.meta.classes, className));
-  return found ? found.content : null;
+  return found ? found : { content: '' };
 }
 
 function parseCopy(content) {

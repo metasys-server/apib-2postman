@@ -31,10 +31,7 @@
             {{#unless @last}},{{/unless}}
             {{/request.headers}}
         ]{{#if request.body}},
-        "body": {
-            "mode": "raw",
-            "raw": {{{json request.body}}}
-        }
+        "body": {{{json request.body}}}
         {{/if}}
     }{{#if response.tests}},
     "event": [
