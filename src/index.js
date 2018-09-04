@@ -10,7 +10,6 @@ Handlebars.registerHelper('json', function (obj) {
 });
 
 var apib2postman = module.exports.convertParsed = function (apib, options) {
-  fs.writeFileSync('raw.json', JSON.stringify(apib, null, 2));
   const title = apib.content[0].meta.title;
 
   const collection = {

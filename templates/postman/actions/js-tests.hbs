@@ -3,17 +3,17 @@ var _ = require('lodash'),
 
 // Used to catch and show fatal errors in the test runner 
 try {
-    const isSuccess = responseCode.code === {{statusCode}};
+    const isSuccess = responseCode.code === {{response.statusCode}};
     const jsonData = pm.response.json();
 
     tests['Status code is correct'] = isSuccess;
 
-    {{#headers}}
+    {{#response.headers}}
     pm.test('{{key}} header value is correct', function () {
         pm.expect(postman.getResponseHeader('{{key}}')).to.contain('{{value}}');
     });
 
-    {{/headers}}
+    {{/response.headers}}
     pm.test('Self link is correct', function () {
         const self = Url.parse(jsonData.self);
         const current = pm.request.url.toJSON();
@@ -34,7 +34,7 @@ try {
         pm.expect(queryDiffs.length).to.equal(0, 'Differences found in the query:   (' + queryDiffs.join(', ') + ')   ');
     });
 
-    const schema = {{{schema}}};
+    const schema = {{{response.jsonSchema}}};
 
     pm.test('JSON Schema is valid', function() {
         pm.expect(tv4.validate(jsonData, schema)).equal(true, tv4.error);
