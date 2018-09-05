@@ -2,7 +2,7 @@
   "name": "@apib/2postman",
   "description": "Convert API Blueprints to Postman Collections",
   "author": "Johnson Controls, Plc.",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "license": "MIT",
   "dependencies": {
     "apib-include-directive": "^0.1.0",

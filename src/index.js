@@ -9,7 +9,7 @@ Handlebars.registerHelper('json', function (obj) {
   return JSON.stringify(obj, null, 4);
 });
 
-var apib2postman = module.exports.convertParsed = function (apib, options) {
+function apib2postman(apib, options) {
   const title = apib.content[0].meta.title;
 
   const collection = {
@@ -253,8 +253,8 @@ function parseJsonSchema(content) {
   return null;
 }
 
-function parseContent(content, className) {
-  const found = _.find(content, x => x.element === 'asset' && _.includes(x.meta.classes, className));
+function parseContent(content, className, elementName) {
+  const found = _.find(content, x => x.element === (elementName || 'asset') && _.includes(x.meta.classes, className));
   return found ? found : { content: '' };
 }
 
@@ -305,11 +305,21 @@ function addEnvVariables(envVariables, variables) {
 exports.convert = function (data, options, callback) {
   try {
     drafter.parse(data, {}, (err, result) => {
-      var result = apib2postman(result, options);
-      return callback(null, result);
+      if (err) {
+        if (err.result) {
+          return callback(`Error: ${JSON.stringify(err.result)}`);
+        }
+        return callback(err);
+      }
+  
+      try {
+        const newResult = apib2postman(result, options);
+        return callback(null, newResult);
+      } catch (error) {
+        return callback(error);
+      }
     });
-  }
-  catch (error) {
-    return callback(error, {});
+  } catch (e) {
+    console.error(e);
   }
 };
