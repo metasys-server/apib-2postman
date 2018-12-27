@@ -242,13 +242,15 @@ function applyRequiredProperties(obj) {
 }
 
 function parseJsonSchema(content) {
-  const schema = JSON.parse(parseContent(content, 'messageBodySchema').content);
-  
-  if (schema) {
-    applyRequiredProperties(schema);
+  try {
+    const schema = JSON.parse(parseContent(content, 'messageBodySchema').content);
 
-    return schema;
-  }
+    if (schema) {
+      applyRequiredProperties(schema);
+
+      return schema;
+    }
+  } catch (e) {}
 
   return null;
 }
