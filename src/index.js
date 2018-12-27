@@ -191,7 +191,7 @@ function parseRequestHeaders(headers) {
 function parseResponse(response) {
   return {
     statusCode: response.attributes.statusCode,
-    headers: parseHeaders(response.attributes.headers.content),
+    headers: response.attributes.headers ? parseHeaders(response.attributes.headers.content) : {},
     body: parseContent(response.content, 'messageBody').content,
     jsonSchema: parseJsonSchema(response.content),
     tests: parseBodyTests(response.content)

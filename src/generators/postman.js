@@ -35,12 +35,20 @@ function parseTests(pathName, action, testTemplate) {
     sortParams.push(...sortRegex.exec(sortQuery.description)[1].replace(/[` ]?/g, '').split(','));
   }
 
-  action.response.jsonSchema = JSON.stringify(jsonSchema, null, 2);
-  action.response.headers = _.filter(headers, x => x.key !== 'Allow');
+  let isPageable = false;
 
-  const isPageable = !!jsonSchema.properties.items
-    && !!jsonSchema.properties.next
-    && jsonSchema.properties.items.type === 'array';
+  if (!!jsonSchema && !!jsonSchema.properties) {
+    action.response.jsonSchema = JSON.stringify(jsonSchema, null, 2);
+
+    isPageable = !!jsonSchema.properties.items
+      && !!jsonSchema.properties.next
+      && jsonSchema.properties.items.type === 'array';
+  } else {
+    action.response.jsonSchema = '{}';
+  }
+
+  action.response.body = action.response.body || '\'\'';
+  action.response.headers = _.filter(headers, x => x.key !== 'Allow');
 
   const testExec = getTestTemplate(testTemplate)({
     pathName,
