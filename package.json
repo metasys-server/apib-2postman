@@ -3,7 +3,7 @@
   "description": "Convert API Blueprints to Postman Collections",
   "author": "Johnson Controls, Plc.",
   "version": "1.1.2",
-  "license": "MIT",
+  "license": "BSD",
   "dependencies": {
     "apib-include-directive": "^0.1.0",
     "drafter.js": "^2.6.7",
@@ -18,6 +18,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+git@github.jci.com:jchrisco/apib2.git"
+    "url": "https://github.com/metasys-server/apib-2postman.git"
   }
 }
