@@ -231,23 +231,11 @@ function parseBodyTests(content) {
   return tests[1].split(/\r\n?|\n/g);
 }
 
-function applyRequiredProperties(obj) {
-  if (obj.properties) {
-    obj.required = Object.getOwnPropertyNames(obj.properties);
-  }
-
-  _.forOwn(obj, value => {
-    _.isObjectLike(value) && applyRequiredProperties(value);
-  });
-}
-
 function parseJsonSchema(content) {
   try {
     const schema = JSON.parse(parseContent(content, 'messageBodySchema').content);
 
     if (schema) {
-      applyRequiredProperties(schema);
-
       return schema;
     }
   } catch (e) {}
