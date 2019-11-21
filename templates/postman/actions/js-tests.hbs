@@ -18,6 +18,9 @@ try {
         const self = Url.parse(jsonData.self);
         const current = pm.request.url.toJSON();
 
+        _.mapValues(self.query, function(x) { x.value = x.value.toLowerCase() });
+        _.mapValues(current.query, function(x) { x.value = x.value.toLowerCase() });
+        
         const pathDiffs = _.difference(self.path, current.path);
         const queryDiffs = _.differenceWith(self.query, current.query, _.isEqual);
 
