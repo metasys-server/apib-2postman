@@ -11,7 +11,8 @@
     "handlebars": "^4.0.11",
     "lodash": "^4.17.10",
     "nopt": "^3.0.6",
-    "uritemplate": "^0.3.4"
+    "uritemplate": "^0.3.4",
+    "mkdir-recursive": "^0.4.0"
   },
   "bin": {
     "apib2postman": "./bin/apib2postman.js"

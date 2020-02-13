@@ -3,6 +3,7 @@ const _ = require('lodash'),
       UriTemplate = require('uritemplate'),
       Handlebars = require('handlebars'),
       postmanGenerator = require('./generators/postman'),
+      fx = require('mkdir-recursive');
       fs = require('fs');
 
 Handlebars.registerHelper('json', function (obj) {
@@ -23,10 +24,6 @@ function apib2postman(apib, options) {
   };
 
   addEnvVariables(environment.values, ['base_url', 'username', 'password', 'include_sad_tests']);
-  const schemaDir = 'schema';
-  if (!fs.existsSync(schemaDir)){
-      fs.mkdirSync(schemaDir);
-  }
 
   apib.content[0].content
     .filter(content => content.element === 'category')
@@ -34,9 +31,9 @@ function apib2postman(apib, options) {
       const title = category.meta.title;
       const groups = [];
 
-      const schemaGroupDir = schemaDir + '/' + title;
+      const schemaGroupDir = options.schema + '/' + title;
       if (!fs.existsSync(schemaGroupDir)){
-          fs.mkdirSync(schemaGroupDir);
+          fx.mkdirSync(schemaGroupDir);
       }
 
       category.content
