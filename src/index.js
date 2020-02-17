@@ -3,7 +3,7 @@ const _ = require('lodash'),
       UriTemplate = require('uritemplate'),
       Handlebars = require('handlebars'),
       postmanGenerator = require('./generators/postman'),
-      fx = require('mkdir-recursive');
+      shell = require('shelljs');
       fs = require('fs');
 
 Handlebars.registerHelper('json', function (obj) {
@@ -33,7 +33,7 @@ function apib2postman(apib, options) {
 
       const schemaGroupDir = options.schema + '/' + title;
       if (!fs.existsSync(schemaGroupDir)){
-          fx.mkdirSync(schemaGroupDir);
+          shell.mkdir('-p', schemaGroupDir);
       }
 
       category.content
