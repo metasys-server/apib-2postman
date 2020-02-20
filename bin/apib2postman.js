@@ -9,13 +9,13 @@ const apib2postman = require('../src/index.js');
 
 var options = nopt({
     'output': String,
-    'schema': String,
+    'contract': String,
     'environment': String,
     'testTemplate': String,
     'help': Boolean
 }, {
     'o': ['--output'],
-    's': ['--schema'],
+    'c': ['--contract'],
     'e': ['--environment'],
     't': ['--testTemplate'],
     'h': ['--help']
@@ -33,7 +33,7 @@ if (options.help || options.argv.remain.length === 0) {
     console.log("Options:")
     console.log("  -h --help Print this help and exit.");
     console.log("  -o --output <file> Output result to file.");
-    console.log("  -s --schema <directory> Directory containing json schema output files.");
+    console.log("  -c --contract <directory> Directory for contract output files.");
     console.log("  -e --environment <file> The output file for the Postman environment.");
     console.log("  -t --testTemplate <template.hbs> The postman test template to use for each action.");
     process.exit();
@@ -44,8 +44,8 @@ const collectionFile = options.output || 'API.postman_collection.json';
 const environmentFile = options.environment || 'API.postman_environment.json';
 const includePath = input ? path.dirname(input) : process.cwd();
 var apibData = '';
-if (!options.schema) {
-    options.schema = 'schema';
+if (!options.contract) {
+    options.contract = 'contract';
 }
 
 fs.createReadStream(input).on('data', (chunk) => {
