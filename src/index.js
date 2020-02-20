@@ -31,9 +31,9 @@ function apib2postman(apib, options) {
       const title = category.meta.title;
       const groups = [];
 
-      const schemaGroupDir = options.schema + '/' + title;
-      if (!fs.existsSync(schemaGroupDir)){
-          shell.mkdir('-p', schemaGroupDir);
+      const contractGroupDir = options.contract + '/' + title;
+      if (!fs.existsSync(contractGroupDir)){
+          shell.mkdir('-p', contractGroupDir);
       }
 
       category.content
@@ -50,12 +50,12 @@ function apib2postman(apib, options) {
             variables: attributes.variable
           };
 
-          const schemaFilePath =  schemaGroupDir + '/' + resource.meta.title + '.json';
+          const contractFilePath =  contractGroupDir + '/' + resource.meta.title + '.json';
           const actions = parseActions(
             baseAction,
             resource.content.filter(x => x.element === 'transition'),
             environment,
-            schemaFilePath
+            contractFilePath
           );
 
           addEnvVariables(environment.values, attributes.envVariable);
@@ -94,7 +94,7 @@ function parsePath(uriTemplate) {
   return decodeURIComponent(uriTemplate.expand(params)).split('/').slice(1);
 }
 
-function parseActions(baseAction, actions, environment, schemaFilePath) {
+function parseActions(baseAction, actions, environment, contractFilePath) {
   return actions.map(action => {
     const transaction = _.find(action.content, x => x.element === 'httpTransaction');
     const request = parseRequest(_.find(transaction.content, x => x.element === 'httpRequest'));
@@ -116,7 +116,17 @@ function parseActions(baseAction, actions, environment, schemaFilePath) {
       addEnvVariables(environment.values, attributes.envVariable);
     }
 
-    const response = parseResponse(_.find(transaction.content, x => x.element === 'httpResponse'), schemaFilePath);
+    const resource = newAction.path.join('/');
+    const response = parseResponse(_.find(transaction.content, x => x.element === 'httpResponse'));
+    const contract = {
+      resource: resource,
+      queryParameters: newAction.query,
+      request: request,
+      statusCode: response.statusCode,
+      responseHeaders: response.headers,
+      jsonSchema: response.jsonSchema
+    }
+    fs.writeFileSync(contractFilePath, JSON.stringify(contract, null, 2));
 
     return _.merge({}, newAction, {
       name: action.meta.title,
@@ -196,12 +206,12 @@ function parseRequestHeaders(headers) {
   return parseHeaders(headers.content.filter(x => x.content.key.content !== 'Authorization'));
 }
 
-function parseResponse(response, schemaFilePath) {
+function parseResponse(response) {
   return {
     statusCode: response.attributes.statusCode,
     headers: response.attributes.headers ? parseHeaders(response.attributes.headers.content) : {},
     body: parseContent(response.content, 'messageBody').content,
-    jsonSchema: parseJsonSchema(response.content, schemaFilePath),
+    jsonSchema: parseJsonSchema(response.content),
     tests: parseBodyTests(response.content)
   };
 }
@@ -239,11 +249,10 @@ function parseBodyTests(content) {
   return tests[1].split(/\r\n?|\n/g);
 }
 
-function parseJsonSchema(content, schemaFilePath) {
+function parseJsonSchema(content) {
   try {
     const schemaJson = parseContent(content, 'messageBodySchema').content;
     const schema = JSON.parse(schemaJson);
-    fs.writeFileSync(schemaFilePath, schemaJson);
     if (schema) {
       return schema;
     }
